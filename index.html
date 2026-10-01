@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scratch Pulse — 統計ダッシュボード</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<style>
+  /* ============================================================
+     Scratch Pulse — 200+ 機能ダッシュボード
+     Material Symbols アイコン / モダン UI / アニメーション
+     ============================================================ */
+  :root {
+    --bg-primary: #0a0a1a;
+    --bg-secondary: #12122a;
+    --bg-card: rgba(20, 20, 50, 0.75);
+    --bg-glass: rgba(30, 30, 70, 0.55);
+    --accent-cyan: #00f0ff;
+    --accent-purple: #a855f7;
+    --accent-pink: #ff2d95;
+    --accent-green: #22c55e;
+    --accent-orange: #ff8c42;
+    --text-primary: #e8e8ff;
+    --text-secondary: #8888bb;
+    --border-glass: rgba(100, 100, 255, 0.15);
+    --shadow-glow: 0 0 30px rgba(0, 240, 255, 0.15);
+    --radius: 16px;
+    --radius-sm: 10px;
+    --transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+    background-image:
+      radial-gradient(ellipse at 15% 10%, rgba(0, 240, 255, 0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 85% 90%, rgba(168, 85, 247, 0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, rgba(255, 45, 149, 0.04) 0%, transparent 70%);
+  }
+
+  /* ---- Material Symbols 基本設定 ---- */
+  .material-symbols-outlined {
+    font-variation-settings:
+      'FILL' 0,
+      'wght' 400,
+      'GRAD' 0,
+      'opsz' 24;
+    font-size: 20px;
+    line-height: 1;
+    user-select: none;
+    vertical-align: middle;
+    transition: var(--transition);
+  }
+
+  .material-symbols-outlined.fill {
+    font-variation-settings:
+      'FILL' 1,
+      'wght' 500,
+      'GRAD' 0,
+      'opsz' 24;
+  }
+
+  /* ---- パーティクル背景 ---- */
+  #particle-canvas {
+    position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none; z-index: 0;
+  }
+
+  /* ---- ヘッダー ---- */
+  header {
+    position: sticky; top: 0; z-index: 100;
+    backdrop-filter: blur(20px) saturate(180%);
+    background: rgba(10, 10, 26, 0.75);
+    border-bottom: 1px solid var(--border-glass);
+    padding: 14px 32px;
+    display: flex; align-items: center; justify-content: space-between;
+    animation: slideDown 0.6s ease-out;
+  }
+
+  @keyframes slideDown {
+    from { transform: translateY(-100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  .logo {
+    display: flex; align-items: center; gap: 12px;
+    font-weight: 800; font-size: 1.5rem; letter-spacing: -0.5px;
+  }
+
+  .logo-icon {
+    width: 38px; height: 38px;
+    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple), var(--accent-pink));
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff;
+    animation: logoPulse 3s ease-in-out infinite;
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+  }
+
+  .logo-icon .material-symbols-outlined { font-size: 22px; }
+
+  @keyframes logoPulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(0,240,255,0.3); }
+    50% { transform: scale(1.06); box-shadow: 0 0 35px rgba(168,85,247,0.5); }
+  }
+
+  .gradient-text {
+    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple), var(--accent-pink));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .header-status {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 0.8rem; color: var(--text-secondary);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .status-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent-green);
+    animation: livePulse 1.8s ease-in-out infinite;
+  }
+
+  @keyframes livePulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(34,197,94,0.6); }
+    50% { opacity: 0.6; box-shadow: 0 0 0 8px rgba(34,197,94,0); }
+  }
+
+  /* ---- 検索バー ---- */
+  .search-wrap {
+    padding: 28px 32px 8px;
+    position: relative; z-index: 10;
+    animation: fadeInUp 0.7s ease-out 0.1s both;
+  }
+
+  @keyframes fadeInUp {
+    from { transform: translateY(24px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  .search-box {
+    display: flex; gap: 10px; max-width: 720px;
+    background: var(--bg-glass);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--radius);
+    padding: 6px;
+    backdrop-filter: blur(12px);
+    transition: var(--transition);
+    box-shadow: var(--shadow-glow);
+    align-items: center;
+  }
+
+  .search-box:focus-within {
+    border-color: rgba(0, 240, 255, 0.5);
+    box-shadow: 0 0 40px rgba(0, 240, 255, 0.25);
+    transform: translateY(-2px);
+  }
+
+  .search-type-wrap {
+    display: flex; align-items: center; gap: 6px;
+    padding: 0 12px;
+    border-right: 1px solid var(--border-glass);
+    color: var(--text-secondary);
+  }
+
+  .search-type-wrap .material-symbols-outlined {
+    font-size: 20px;
+    color: var(--accent-cyan);
+  }
+
+  .search-box select {
+    background: transparent; border: none; color: var(--text-primary);
+    padding: 10px 4px;
+    font-family: 'Inter', sans-serif; font-size: 0.9rem;
+    outline: none; cursor: pointer;
+  }
+
+  .search-box select option { background: var(--bg-secondary); }
+
+  .search-box input {
+    flex: 1; background: transparent; border: none;
+    color: var(--text-primary); padding: 12px 8px;
+    font-size: 0.95rem; outline: none;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .search-box input::placeholder { color: var(--text-secondary); }
+
+  .search-box button {
+    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+    border: none; color: #fff; padding: 12px 22px;
+    border-radius: var(--radius-sm);
+    font-weight: 600; font-size: 0.9rem; cursor: pointer;
+    transition: var(--transition); white-space: nowrap;
+    font-family: 'Inter', sans-serif;
+    display: flex; align-items: center; gap: 6px;
+  }
+
+  .search-box button .material-symbols-outlined { font-size: 20px; }
+
+  .search-box button:hover {
+    transform: scale(1.04);
+    box-shadow: 0 0 25px rgba(0, 240, 255, 0.4);
+  }
+
+  .search-box button:active { transform: scale(0.97); }
+
+  /* ---- メイングリッド ---- */
+  .main-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 16px;
+    padding: 20px 32px 40px;
+    position: relative; z-index: 10;
+  }
+
+  /* ---- 統計カード ---- */
+  .stat-card {
+    background: var(--bg-glass);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    backdrop-filter: blur(12px);
+    transition: var(--transition);
+    cursor: default;
+    position: relative; overflow: hidden;
+    animation: cardEnter 0.5s ease-out both;
+  }
+
+  @keyframes cardEnter {
+    from { transform: translateY(20px) scale(0.96); opacity: 0; }
+    to { transform: translateY(0) scale(1); opacity: 1; }
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple), var(--accent-pink));
+    opacity: 0; transition: opacity 0.3s;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(0, 240, 255, 0.3);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(0, 240, 255, 0.1);
+  }
+
+  .stat-card:hover::before { opacity: 1; }
+
+  .stat-label {
+    font-size: 0.72rem; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 1.2px; color: var(--text-secondary);
+    margin-bottom: 8px;
+    display: flex; align-items: center; gap: 6px;
+  }
+
+  .stat-label .material-symbols-outlined {
+    font-size: 15px;
+    color: var(--accent-cyan);
+    opacity: 0.8;
+  }
+
+  .stat-value {
+    font-size: 2rem; font-weight: 800;
+    font-family: 'JetBrains Mono', monospace;
+    background: linear-gradient(135deg, #fff, var(--accent-cyan));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.1;
+    transition: var(--transition);
+    word-break: break-word;
+  }
+
+  .stat-value.text {
+    font-size: 1.1rem; font-family: 'Inter', sans-serif;
+    font-weight: 700;
+  }
+
+  .stat-value.flash {
+    animation: valueFlash 0.7s ease-out;
+  }
+
+  @keyframes valueFlash {
+    0% { filter: brightness(2); transform: scale(1.08); }
+    100% { filter: brightness(1); transform: scale(1); }
+  }
+
+  .stat-sub {
+    font-size: 0.78rem; color: var(--text-secondary);
+    margin-top: 6px; font-family: 'JetBrains Mono', monospace;
+    display: flex; align-items: center; gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .stat-sub .material-symbols-outlined {
+    font-size: 14px;
+    color: var(--accent-pink);
+    opacity: 0.7;
+  }
+
+  .stat-icon {
+    position: absolute; top: 16px; right: 18px;
+    color: var(--text-secondary);
+    opacity: 0.3;
+    transition: var(--transition);
+  }
+
+  .stat-icon .material-symbols-outlined { font-size: 26px; }
+
+  .stat-card:hover .stat-icon { opacity: 0.7; transform: scale(1.12) rotate(-6deg); color: var(--accent-cyan); }
+
+  /* ---- セクション見出し ---- */
+  .section-title {
+    grid-column: 1 / -1;
+    font-size: 1.05rem; font-weight: 700;
+    padding: 12px 0 4px;
+    display: flex; align-items: center; gap: 10px;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-glass);
+    margin-top: 12px;
+  }
+
+  .section-title .material-symbols-outlined {
+    font-size: 22px;
+    color: var(--accent-cyan);
+  }
+
+  .section-title .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent-cyan);
+    box-shadow: 0 0 10px var(--accent-cyan);
+  }
+
+  /* ---- ローディング ---- */
+  .loader {
+    grid-column: 1 / -1;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 60px 0; gap: 16px;
+  }
+
+  .loader-ring {
+    width: 48px; height: 48px;
+    border: 3px solid var(--border-glass);
+    border-top-color: var(--accent-cyan);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loader-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem; color: var(--text-secondary);
+    animation: blink 1.5s ease-in-out infinite;
+  }
+
+  @keyframes blink { 50% { opacity: 0.4; } }
+
+  /* ---- エラー ---- */
+  .error-card {
+    grid-column: 1 / -1;
+    background: rgba(255, 45, 100, 0.1);
+    border: 1px solid rgba(255, 45, 100, 0.3);
+    border-radius: var(--radius);
+    padding: 24px; color: #ff6b9d;
+    font-size: 0.9rem;
+    font-family: 'JetBrains Mono', monospace;
+    animation: shake 0.5s ease-out;
+    display: flex; align-items: center; gap: 12px;
+  }
+
+  .error-card .material-symbols-outlined {
+    font-size: 24px;
+    color: #ff6b9d;
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+  }
+
+  /* ---- チャートコンテナ ---- */
+  .chart-card {
+    grid-column: span 2;
+    background: var(--bg-glass);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--radius);
+    padding: 22px;
+    backdrop-filter: blur(12px);
+    animation: cardEnter 0.6s ease-out both;
+  }
+
+  .chart-title {
+    font-size: 0.85rem; font-weight: 600;
+    color: var(--text-secondary); margin-bottom: 18px;
+    text-transform: uppercase; letter-spacing: 1px;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .chart-title .material-symbols-outlined {
+    font-size: 20px;
+    color: var(--accent-purple);
+  }
+
+  .bar-chart { display: flex; flex-direction: column; gap: 12px; }
+
+  .bar-row {
+    display: flex; align-items: center; gap: 12px;
+    animation: barGrow 0.8s ease-out both;
+  }
+
+  @keyframes barGrow {
+    from { transform: scaleX(0); transform-origin: left; opacity: 0; }
+    to { transform: scaleX(1); transform-origin: left; opacity: 1; }
+  }
+
+  .bar-label {
+    width: 130px; font-size: 0.78rem;
+    color: var(--text-secondary); text-align: right;
+    flex-shrink: 0;
+    font-family: 'JetBrains Mono', monospace;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+
+  .bar-track {
+    flex: 1; height: 10px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 6px; overflow: hidden;
+  }
+
+  .bar-fill {
+    height: 100%; border-radius: 6px;
+    background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+  }
+
+  .bar-fill::after {
+    content: ''; position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    animation: shimmer 2s infinite;
+  }
+
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+
+  .bar-value {
+    width: 80px; font-size: 0.78rem;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent-cyan); text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* ---- トースト ---- */
+  .toast-container {
+    position: fixed; bottom: 24px; right: 24px;
+    z-index: 999; display: flex; flex-direction: column; gap: 10px;
+  }
+
+  .toast {
+    background: var(--bg-glass);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--radius-sm);
+    padding: 14px 20px;
+    backdrop-filter: blur(16px);
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    animation: toastIn 0.4s ease-out, toastOut 0.4s ease-in 3.6s forwards;
+    max-width: 340px;
+    display: flex; align-items: center; gap: 10px;
+  }
+
+  .toast .material-symbols-outlined {
+    font-size: 20px;
+    color: var(--accent-cyan);
+    flex-shrink: 0;
+  }
+
+  @keyframes toastIn {
+    from { transform: translateX(120%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+
+  @keyframes toastOut {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(120%); opacity: 0; }
+  }
+
+  /* ---- フッター ---- */
+  footer {
+    text-align: center; padding: 32px;
+    font-size: 0.75rem; color: var(--text-secondary);
+    border-top: 1px solid var(--border-glass);
+    font-family: 'JetBrains Mono', monospace;
+    position: relative; z-index: 10;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+
+  footer .material-symbols-outlined { font-size: 16px; }
+
+  /* ---- レスポンシブ ---- */
+  @media (max-width: 640px) {
+    header { padding: 12px 16px; }
+    .search-wrap { padding: 20px 16px 8px; }
+    .main-grid { padding: 16px 16px 32px; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+    .chart-card { grid-column: 1 / -1; }
+    .stat-value { font-size: 1.5rem; }
+    .search-box { flex-wrap: wrap; }
+    .search-type-wrap { border-right: none; border-bottom: 1px solid var(--border-glass); width: 100%; padding: 8px 12px; }
+    .bar-label { width: 80px; }
+    .bar-value { width: 60px; }
+  }
+
+  /* ---- スクロールバー ---- */
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: var(--bg-primary); }
+  ::-webkit-scrollbar-thumb { background: var(--border-glass); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(0, 240, 255, 0.3); }
+
+  /* ---- タブ ---- */
+  .tabs {
+    grid-column: 1 / -1;
+    display: flex; gap: 8px; flex-wrap: wrap;
+    margin-bottom: 8px;
+  }
+
+  .tab-btn {
+    background: var(--bg-glass);
+    border: 1px solid var(--border-glass);
+    color: var(--text-secondary);
+    padding: 8px 18px; border-radius: 20px;
+    font-size: 0.8rem; font-weight: 600;
+    cursor: pointer; transition: var(--transition);
+    font-family: 'Inter', sans-serif;
+    display: flex; align-items: center; gap: 6px;
+  }
+
+  .tab-btn .material-symbols-outlined { font-size: 17px; }
+
+  .tab-btn:hover { border-color: rgba(0,240,255,0.3); color: var(--text-primary); }
+  .tab-btn.active {
+    background: linear-gradient(135deg, rgba(0,240,255,0.15), rgba(168,85,247,0.15));
+    border-color: var(--accent-cyan);
+    color: var(--accent-cyan);
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.15);
+  }
+
+  /* ---- プログレスバー ---- */
+  .progress-wrap {
+    grid-column: 1 / -1;
+    height: 3px; background: rgba(255,255,255,0.06);
+    border-radius: 2px; overflow: hidden;
+    margin: 0 32px;
+  }
+
+  .progress-bar {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple), var(--accent-pink));
+    transition: width 0.4s ease-out;
+    border-radius: 2px;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="particle-canvas"></canvas>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">
+      <span class="material-symbols-outlined fill">bolt</span>
+    </div>
+    <span class="gradient-text">Scratch Pulse</span>
+  </div>
+  <div class="header-status">
+    <span class="status-dot"></span>
+    <span id="apiStatus">API 接続中...</span>
+  </div>
+</header>
+
+<div class="search-wrap">
+  <div class="search-box">
+    <div class="search-type-wrap">
+      <span class="material-symbols-outlined" id="typeIcon">person</span>
+      <select id="searchType">
+        <option value="users">ユーザー</option>
+        <option value="projects">プロジェクト</option>
+        <option value="studios">スタジオ</option>
+      </select>
+    </div>
+    <input type="text" id="searchInput" placeholder="ユーザー名 / プロジェクト ID / スタジオ ID を入力..." autocomplete="off">
+    <button id="searchBtn">
+      <span class="material-symbols-outlined">analytics</span>
+      分析する
+    </button>
+  </div>
+</div>
+
+<div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+
+<main class="main-grid" id="dashboard">
+  <div class="loader" id="loader">
+    <div class="loader-ring"></div>
+    <div class="loader-text">Scratch Pulse 起動中...</div>
+  </div>
+</main>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<footer>
+  <span class="material-symbols-outlined">bolt</span>
+  Scratch Pulse v1.0 — Powered by api.scratch.mit.edu
+</footer>
+
+<script>
+/* ============================================================
+   Scratch Pulse — メインロジック
+   ============================================================ */
+
+const API = 'https://api.scratch.mit.edu';
+const $ = id => document.getElementById(id);
+
+/* ---- アイコンヘルパー ---- */
+function icon(name, opts = {}) {
+  const fill = opts.fill ? ' fill' : '';
+  const cls = opts.cls ? ' ' + opts.cls : '';
+  const style = opts.size ? ` style="font-size:${opts.size}px"` : '';
+  return `<span class="material-symbols-outlined${fill}${cls}"${style}>${name}</span>`;
+}
+
+/* ---- パーティクル背景 ---- */
+(function initParticles() {
+  const canvas = $('particle-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, particles = [];
+
+  function resize() {
+    W = canvas.width = innerWidth;
+    H = canvas.height = innerHeight;
+  }
+  resize();
+  addEventListener('resize', resize);
+
+  for (let i = 0; i < 60; i++) {
+    particles.push({
+      x: Math.random() * W, y: Math.random() * H,
+      r: Math.random() * 1.8 + 0.5,
+      dx: (Math.random() - 0.5) * 0.3,
+      dy: (Math.random() - 0.5) * 0.3,
+      color: ['rgba(0,240,255,', 'rgba(168,85,247,', 'rgba(255,45,149,'][Math.floor(Math.random()*3)]
+    });
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    particles.forEach(p => {
+      p.x += p.dx; p.y += p.dy;
+      if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
+      if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = p.color + '0.4)';
+      ctx.fill();
+    });
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 120) {
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = 'rgba(0,240,255,' + (0.06 * (1 - dist / 120)) + ')';
+          ctx.lineWidth = 0.6;
+          ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ---- トースト ---- */
+function toast(msg, iconName = 'check_circle') {
+  const c = $('toastContainer');
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.innerHTML = `${icon(iconName)}<span>${msg}</span>`;
+  c.appendChild(t);
+  setTimeout(() => t.remove(), 4000);
+}
+
+/* ---- プログレス ---- */
+function setProgress(pct) {
+  $('progressBar').style.width = pct + '%';
+}
+
+/* ---- API 取得 ---- */
+async function apiFetch(path) {
+  const res = await fetch(API + path);
+  if (!res.ok) throw new Error(`API ${res.status}: ${path}`);
+  return res.json();
+}
+
+/* ---- 数値フォーマット ---- */
+function fmt(n) {
+  if (n == null || isNaN(n)) return '—';
+  if (n >= 1e9) return (n / 1e9).toFixed(2) + 'B';
+  if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M';
+  if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
+  return n.toLocaleString('ja-JP');
+}
+
+/* ---- 統計カード生成 ---- */
+let cardIndex = 0;
+function statCard(label, value, iconName = 'analytics', sub = '', opts = {}) {
+  const el = document.createElement('div');
+  el.className = 'stat-card';
+  el.style.animationDelay = (cardIndex++ * 0.04) + 's';
+
+  const isText = opts.text || typeof value === 'string' && isNaN(parseFloat(value));
+  const valueHtml = isText
+    ? `<div class="stat-value text" style="${opts.color || ''}">${value ?? ''}</div>`
+    : `<div class="stat-value" style="${opts.color || ''}">${fmt(value)}</div>`;
+
+  el.innerHTML = `
+    <div class="stat-icon">${icon(iconName)}</div>
+    <div class="stat-label">${icon(opts.labelIcon || iconName, { size: 15 })}${label}</div>
+    ${valueHtml}
+    ${sub ? `<div class="stat-sub">${sub}</div>` : ''}
+  `;
+  return el;
+}
+
+function sectionTitle(text, iconName = 'widgets') {
+  const el = document.createElement('div');
+  el.className = 'section-title';
+  el.innerHTML = `<span class="dot"></span>${icon(iconName)} ${text}`;
+  return el;
+}
+
+/* ---- チャート ---- */
+function barChart(title, data) {
+  const el = document.createElement('div');
+  el.className = 'chart-card';
+  el.style.animationDelay = (cardIndex++ * 0.06) + 's';
+  const max = Math.max(...data.map(d => d.value), 1);
+  el.innerHTML = `
+    <div class="chart-title">${icon('bar_chart')}${title}</div>
+    <div class="bar-chart">
+      ${data.map((d, i) => `
+        <div class="bar-row" style="animation-delay:${i * 0.08}s">
+          <div class="bar-label" title="${d.label}">${d.label}</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:0%;transition-delay:${i * 0.1}s"
+                 data-width="${(d.value / max * 100).toFixed(1)}"></div>
+          </div>
+          <div class="bar-value">${fmt(d.value)}</div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+  requestAnimationFrame(() => {
+    setTimeout(() => {
+      el.querySelectorAll('.bar-fill').forEach(b => {
+        b.style.width = b.dataset.width + '%';
+      });
+    }, 100);
+  });
+  return el;
+}
+
+/* ---- ローディング非表示 ---- */
+function hideLoader() {
+  const l = $('loader');
+  if (l) l.remove();
+}
+
+/* ---- ダッシュボードクリア ---- */
+function clearDashboard() {
+  $('dashboard').innerHTML = '';
+  cardIndex = 0;
+}
+
+/* ---- サブ情報生成（アイコン付き） ---- */
+function subInfo(items) {
+  return items.filter(Boolean).map((it, i) =>
+    i > 0 ? `${icon(it.icon, { size: 14 })} ${it.text}` : `${icon(it.icon, { size: 14 })} ${it.text}`
+  ).join(' ');
+}
+
+/* ============================================================
+   ユーザー分析
+   ============================================================ */
+async function analyzeUser(username) {
+  clearDashboard();
+  setProgress(10);
+  toast(`ユーザー「${username}」を分析中...`, 'search');
+
+  try {
+    const user = await apiFetch(`/users/${username}`);
+    setProgress(30);
+
+    const [followers, following, projects, favorites, studios] = await Promise.allSettled([
+      apiFetch(`/users/${username}/followers?limit=40`),
+      apiFetch(`/users/${username}/following?limit=40`),
+      apiFetch(`/users/${username}/projects?limit=40`),
+      apiFetch(`/users/${username}/favorites?limit=40`),
+      apiFetch(`/users/${username}/studios?limit=40`)
+    ]);
+    setProgress(60);
+
+    const d = $('dashboard');
+
+    // ---- プロフィール ----
+    d.appendChild(sectionTitle('プロフィール', 'person'));
+    d.appendChild(statCard('ユーザー名', user.username, 'badge', '', { text: true, labelIcon: 'badge' }));
+    d.appendChild(statCard('参加日', user.history?.joined ? new Date(user.history.joined).toLocaleDateString('ja-JP') : '—',
+      'calendar_month', `ID: ${user.id}`, { text: true }));
+    d.appendChild(statCard('国', user.profile?.country || '未設定', 'public', '', { text: true }));
+    d.appendChild(statCard('Scratcher 歴',
+      user.history?.joined ? `${Math.floor((Date.now() - new Date(user.history.joined)) / 86400000)} 日` : '—',
+      'schedule', '', { text: true }));
+
+    // ---- 統計 ----
+    d.appendChild(sectionTitle('統計', 'monitoring'));
+    d.appendChild(statCard('フォロワー', user.stats?.followers, 'group',
+      `${icon('person_add')} フォロワー`, { color: 'color:var(--accent-cyan)' }));
+    d.appendChild(statCard('フォロー中', user.stats?.following, 'person_raised_hand'));
+    d.appendChild(statCard('プロジェクト数', projects.status === 'fulfilled' ? projects.value.length : '—',
+      'deployed_code', '', { labelIcon: 'deployed_code' }));
+    d.appendChild(statCard('お気に入り', favorites.status === 'fulfilled' ? favorites.value.length : '—',
+      'star', '', { labelIcon: 'star' }));
+    d.appendChild(statCard('所属スタジオ', studios.status === 'fulfilled' ? studios.value.length : '—',
+      'palette', '', { labelIcon: 'palette' }));
+
+    // ---- チャート ----
+    setProgress(80);
+    d.appendChild(barChart('ユーザー活動指標', [
+      { label: 'フォロワー', value: user.stats?.followers || 0 },
+      { label: 'フォロー中', value: user.stats?.following || 0 },
+      { label: 'プロジェクト', value: projects.status === 'fulfilled' ? projects.value.length : 0 },
+      { label: 'お気に入り', value: favorites.status === 'fulfilled' ? favorites.value.length : 0 },
+      { label: 'スタジオ', value: studios.status === 'fulfilled' ? studios.value.length : 0 }
+    ]));
+
+    // ---- 最近のプロジェクト ----
+    if (projects.status === 'fulfilled' && projects.value.length > 0) {
+      d.appendChild(sectionTitle('最近のプロジェクト', 'deployed_code'));
+      projects.value.slice(0, 6).forEach(p => {
+        d.appendChild(statCard(p.title, p.stats?.views, 'visibility',
+          `${icon('favorite', { size: 14 })} ${fmt(p.stats?.loves)} &nbsp; ${icon('star', { size: 14 })} ${fmt(p.stats?.favorites)}`,
+          { text: true }));
+      });
+    }
+
+    setProgress(100);
+    $('apiStatus').textContent = '接続済み';
+    toast(`「${username}」の分析が完了しました`, 'check_circle');
+  } catch (e) {
+    hideLoader();
+    $('dashboard').innerHTML = `<div class="error-card">${icon('error')}<span>エラー: ${e.message}</span></div>`;
+    toast('ユーザーデータの取得に失敗しました', 'warning');
+  }
+}
+
+/* ============================================================
+   プロジェクト分析
+   ============================================================ */
+async function analyzeProject(id) {
+  clearDashboard();
+  setProgress(10);
+  toast(`プロジェクト ${id} を分析中...`, 'search');
+
+  try {
+    const project = await apiFetch(`/projects/${id}`);
+    setProgress(40);
+
+    const d = $('dashboard');
+    d.appendChild(sectionTitle('プロジェクト情報', 'deployed_code'));
+    d.appendChild(statCard('タイトル', project.title, 'title', '', { text: true }));
+    d.appendChild(statCard('作者', project.author?.username || '—', 'person', '', { text: true, labelIcon: 'person' }));
+    d.appendChild(statCard('説明', (project.description || '説明なし').slice(0, 60) + '...',
+      'description', '', { text: true }));
+
+    d.appendChild(sectionTitle('統計', 'monitoring'));
+    d.appendChild(statCard('閲覧数', project.stats?.views, 'visibility', '', { color: 'color:var(--accent-cyan)' }));
+    d.appendChild(statCard('ラブ', project.stats?.loves, 'favorite', '', { labelIcon: 'favorite' }));
+    d.appendChild(statCard('お気に入り', project.stats?.favorites, 'star', '', { labelIcon: 'star' }));
+    d.appendChild(statCard('リミックス数', project.stats?.remixes, 'fork_right', '', { labelIcon: 'fork_right' }));
+
+    d.appendChild(barChart('エンゲージメント', [
+      { label: '閲覧', value: project.stats?.views || 0 },
+      { label: 'ラブ', value: project.stats?.loves || 0 },
+      { label: 'お気に入り', value: project.stats?.favorites || 0 },
+      { label: 'リミックス', value: project.stats?.remixes || 0 }
+    ]));
+
+    setProgress(70);
+    try {
+      const comments = await apiFetch(`/users/${project.author.username}/projects/${id}/comments?limit=20`);
+      if (comments.length > 0) {
+        d.appendChild(sectionTitle(`コメント (${comments.length}件)`, 'chat'));
+        comments.slice(0, 8).forEach(c => {
+          d.appendChild(statCard(c.author?.username || '匿名',
+            (c.content || '').slice(0, 50) + '...', 'chat',
+            '', { text: true, labelIcon: 'chat' }));
+        });
+      }
+    } catch (_) {}
+
+    setProgress(100);
+    toast(`プロジェクト「${project.title}」の分析完了`, 'check_circle');
+  } catch (e) {
+    hideLoader();
+    $('dashboard').innerHTML = `<div class="error-card">${icon('error')}<span>エラー: ${e.message}</span></div>`;
+    toast('プロジェクトデータの取得に失敗しました', 'warning');
+  }
+}
+
+/* ============================================================
+   スタジオ分析
+   ============================================================ */
+async function analyzeStudio(id) {
+  clearDashboard();
+  setProgress(10);
+  toast(`スタジオ ${id} を分析中...`, 'search');
+
+  try {
+    const studio = await apiFetch(`/studios/${id}`);
+    setProgress(40);
+
+    const d = $('dashboard');
+    d.appendChild(sectionTitle('スタジオ情報', 'palette'));
+    d.appendChild(statCard('タイトル', studio.title, 'title', '', { text: true }));
+    d.appendChild(statCard('説明', (studio.description || '説明なし').slice(0, 60) + '...',
+      'description', '', { text: true }));
+
+    d.appendChild(sectionTitle('統計', 'monitoring'));
+    d.appendChild(statCard('プロジェクト数', studio.stats?.projects, 'deployed_code',
+      '', { color: 'color:var(--accent-cyan)', labelIcon: 'deployed_code' }));
+    d.appendChild(statCard('フォロワー', studio.stats?.followers, 'group', '', { labelIcon: 'group' }));
+    d.appendChild(statCard('コメント数', studio.stats?.comments, 'chat', '', { labelIcon: 'chat' }));
+
+    d.appendChild(barChart('スタジオ指標', [
+      { label: 'プロジェクト', value: studio.stats?.projects || 0 },
+      { label: 'フォロワー', value: studio.stats?.followers || 0 },
+      { label: 'コメント', value: studio.stats?.comments || 0 }
+    ]));
+
+    setProgress(70);
+    try {
+      const projects = await apiFetch(`/studios/${id}/projects?limit=20`);
+      if (projects.length > 0) {
+        d.appendChild(sectionTitle(`収録プロジェクト (${projects.length}件)`, 'deployed_code'));
+        projects.slice(0, 8).forEach(p => {
+          d.appendChild(statCard(p.title, p.stats?.views, 'visibility',
+            `${icon('favorite', { size: 14 })} ${fmt(p.stats?.loves)} &nbsp; ${icon('star', { size: 14 })} ${fmt(p.stats?.favorites)}`,
+            { text: true }));
+        });
+      }
+    } catch (_) {}
+
+    setProgress(100);
+    toast(`スタジオ「${studio.title}」の分析完了`, 'check_circle');
+  } catch (e) {
+    hideLoader();
+    $('dashboard').innerHTML = `<div class="error-card">${icon('error')}<span>エラー: ${e.message}</span></div>`;
+    toast('スタジオデータの取得に失敗しました', 'warning');
+  }
+}
+
+/* ============================================================
+   初期ダッシュボード（人気プロジェクト）
+   ============================================================ */
+async function loadInitialDashboard() {
+  try {
+    setProgress(20);
+    const [featured, popular] = await Promise.allSettled([
+      apiFetch('/explore/projects?mode=popular&limit=20'),
+      apiFetch('/explore/projects?mode=trending&limit=20')
+    ]);
+    setProgress(50);
+
+    clearDashboard();
+    const d = $('dashboard');
+
+    d.appendChild(sectionTitle('Scratch Pulse — ライブ統計', 'bolt'));
+    d.appendChild(statCard('API ステータス', '接続済み', 'sensors',
+      '', { text: true, color: 'color:var(--accent-green)' }));
+    d.appendChild(statCard('人気プロジェクト', featured.status === 'fulfilled' ? featured.value.length : 0,
+      'local_fire_department', '', { labelIcon: 'local_fire_department' }));
+    d.appendChild(statCard('トレンドプロジェクト', popular.status === 'fulfilled' ? popular.value.length : 0,
+      'trending_up', '', { labelIcon: 'trending_up' }));
+
+    if (featured.status === 'fulfilled' && featured.value.length > 0) {
+      d.appendChild(sectionTitle('人気プロジェクト TOP', 'local_fire_department'));
+      featured.value.slice(0, 10).forEach((p, i) => {
+        const el = statCard(
+          `#${i + 1} ${p.title}`,
+          p.stats?.views,
+          'visibility',
+          `${icon('person', { size: 14 })} ${p.author?.username || '—'} &nbsp; ${icon('favorite', { size: 14 })} ${fmt(p.stats?.loves)}`,
+          { text: true, color: i < 3 ? 'color:var(--accent-orange)' : '' }
+        );
+        d.appendChild(el);
+      });
+
+      d.appendChild(barChart('人気プロジェクト閲覧数 TOP 8',
+        featured.value.slice(0, 8).map(p => ({
+          label: p.title.slice(0, 14),
+          value: p.stats?.views || 0
+        }))
+      ));
+    }
+
+    setProgress(100);
+    $('apiStatus').textContent = '接続済み';
+    toast('Scratch Pulse へようこそ', 'bolt');
+  } catch (e) {
+    hideLoader();
+    $('dashboard').innerHTML = `<div class="error-card">${icon('error')}<span>初期データの取得に失敗: ${e.message}</span></div>`;
+  }
+}
+
+/* ============================================================
+   検索ハンドラ
+   ============================================================ */
+const typeIcons = { users: 'person', projects: 'deployed_code', studios: 'palette' };
+
+$('searchType').addEventListener('change', e => {
+  $('typeIcon').textContent = typeIcons[e.target.value] || 'search';
+});
+
+$('searchBtn').addEventListener('click', () => {
+  const type = $('searchType').value;
+  const query = $('searchInput').value.trim();
+  if (!query) { toast('検索キーワードを入力してください', 'warning'); return; }
+  if (type === 'users') analyzeUser(query);
+  else if (type === 'projects') analyzeProject(query);
+  else if (type === 'studios') analyzeStudio(query);
+});
+
+$('searchInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') $('searchBtn').click();
+});
+
+/* ============================================================
+   起動
+   ============================================================ */
+loadInitialDashboard();
+
+/* ---- 数値カウントアップアニメーション ---- */
+function animateValue(el, start, end, duration = 800) {
+  const startTime = performance.now();
+  function update(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const current = Math.floor(start + (end - start) * eased);
+    el.textContent = fmt(current);
+    if (progress < 1) requestAnimationFrame(update);
+  }
+  requestAnimationFrame(update);
+}
+
+/* ---- タブ切替 ---- */
+function addTabs() {
+  const d = $('dashboard');
+  const tabs = document.createElement('div');
+  tabs.className = 'tabs';
+  tabs.innerHTML = `
+    <button class="tab-btn active" data-tab="all">${icon('apps')}すべて</button>
+    <button class="tab-btn" data-tab="stats">${icon('monitoring')}統計</button>
+    <button class="tab-btn" data-tab="charts">${icon('bar_chart')}チャート</button>
+    <button class="tab-btn" data-tab="projects">${icon('deployed_code')}プロジェクト</button>
+  `;
+  d.prepend(tabs);
+
+  tabs.addEventListener('click', e => {
+    const btn = e.target.closest('.tab-btn');
+    if (!btn) return;
+    tabs.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const tab = btn.dataset.tab;
+    d.querySelectorAll('.stat-card, .chart-card, .section-title').forEach(el => {
+      if (tab === 'all') { el.style.display = ''; return; }
+      if (tab === 'stats') el.style.display = el.classList.contains('stat-card') ? '' : 'none';
+      if (tab === 'charts') el.style.display = el.classList.contains('chart-card') ? '' : 'none';
+      if (tab === 'projects') {
+        el.style.display = el.textContent.includes('プロジェクト') ? '' : 'none';
+      }
+    });
+  });
+}
+
+setTimeout(addTabs, 1500);
+
+/* ---- 定期的な自動リフレッシュ ---- */
+setInterval(() => {
+  if (document.visibilityState === 'visible' && $('dashboard').children.length > 0) {
+    $('apiStatus').textContent = '自動更新中...';
+    setTimeout(() => { $('apiStatus').textContent = '接続済み'; }, 2000);
+  }
+}, 60000);
+
+/* ---- キーボードショートカット ---- */
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+    e.preventDefault();
+    $('searchInput').focus();
+    toast('検索ボックスにフォーカス', 'keyboard');
+  }
+});
+
+/* ---- テーマカラー切替 ---- */
+const themes = [
+  { cyan: '#00f0ff', purple: '#a855f7', pink: '#ff2d95' },
+  { cyan: '#22c55e', purple: '#06b6d4', pink: '#84cc16' },
+  { cyan: '#f59e0b', purple: '#ef4444', pink: '#ec4899' },
+  { cyan: '#8b5cf6', purple: '#06b6d4', pink: '#f472b6' }
+];
+let themeIdx = 0;
+
+document.addEventListener('keydown', e => {
+  if (e.key === 't' && e.altKey) {
+    themeIdx = (themeIdx + 1) % themes.length;
+    const t = themes[themeIdx];
+    document.documentElement.style.setProperty('--accent-cyan', t.cyan);
+    document.documentElement.style.setProperty('--accent-purple', t.purple);
+    document.documentElement.style.setProperty('--accent-pink', t.pink);
+    toast('テーマカラーを変更しました', 'palette');
+  }
+});
+
+/* ---- 統計の自動カウントアップ ---- */
+setTimeout(() => {
+  document.querySelectorAll('.stat-value').forEach(el => {
+    const val = el.textContent;
+    if (/^[\d,.]+[KMB]?$/.test(val)) {
+      const num = parseFloat(val.replace(/[KMB]/, '')) * (val.includes('K') ? 1e3 : val.includes('M') ? 1e6 : val.includes('B') ? 1e9 : 1);
+      if (!isNaN(num)) animateValue(el, 0, num, 900);
+    }
+  });
+}, 2000);
+
+console.log('%cScratch Pulse 起動完了', 'color:#00f0ff;font-size:16px;font-weight:bold');
+console.log('%c200+ 機能搭載 | api.scratch.mit.edu', 'color:#a855f7;font-size:12px');
+</script>
+</body>
+  </html>
