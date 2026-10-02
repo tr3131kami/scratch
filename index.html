@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Scratch Pulse — 統計 + 速度テスト</title>
+<title>Scratch Pulse — 統計ダッシュボード</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
@@ -104,244 +104,14 @@
     0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(34,197,94,0.6); }
     50% { opacity: 0.6; box-shadow: 0 0 0 8px rgba(34,197,94,0); }
   }
-
-  /* ============================================================
-     速度テスト セクション
-     ============================================================ */
-  .speedtest-wrap {
-    padding: 28px 32px 8px;
-    position: relative; z-index: 10;
-    animation: fadeInUp 0.7s ease-out both;
-  }
-  @keyframes fadeInUp {
-    from { transform: translateY(24px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-  }
-  .speedtest-card {
-    background: linear-gradient(135deg, rgba(30, 30, 70, 0.7), rgba(20, 20, 50, 0.6));
-    border: 1px solid var(--border-glass);
-    border-radius: 22px;
-    padding: 28px;
-    backdrop-filter: blur(18px);
-    box-shadow: 0 20px 60px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
-    position: relative;
-    overflow: hidden;
-  }
-  .speedtest-card::before {
-    content: '';
-    position: absolute; top: -50%; right: -20%;
-    width: 400px; height: 400px;
-    background: radial-gradient(circle, rgba(0,240,255,0.15), transparent 70%);
-    pointer-events: none;
-    animation: glowMove 8s ease-in-out infinite;
-  }
-  @keyframes glowMove {
-    0%, 100% { transform: translate(0, 0); }
-    50% { transform: translate(-60px, 40px); }
-  }
-  .speedtest-header {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 22px; position: relative; z-index: 2;
-    flex-wrap: wrap; gap: 12px;
-  }
-  .speedtest-title {
-    display: flex; align-items: center; gap: 10px;
-    font-size: 1.05rem; font-weight: 700;
-  }
-  .speedtest-title .material-symbols-outlined {
-    font-size: 24px;
-    color: var(--accent-cyan);
-    animation: signalSpin 4s linear infinite;
-  }
-  @keyframes signalSpin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-  .speedtest-body {
-    display: grid;
-    grid-template-columns: 260px 1fr;
-    gap: 28px;
-    align-items: center;
-    position: relative; z-index: 2;
-  }
-  @media (max-width: 720px) {
-    .speedtest-body { grid-template-columns: 1fr; }
-  }
-
-  /* ---- 円形ゲージ ---- */
-  .gauge-wrap {
-    position: relative;
-    width: 240px; height: 240px;
-    margin: 0 auto;
-    filter: drop-shadow(0 0 20px rgba(0, 240, 255, 0.25));
-  }
-  .gauge-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
-  .gauge-bg {
-    fill: none; stroke: rgba(255,255,255,0.06); stroke-width: 14;
-  }
-  .gauge-track {
-    fill: none; stroke: url(#gaugeGrad); stroke-width: 14;
-    stroke-linecap: round;
-    stroke-dasharray: 691;
-    stroke-dashoffset: 691;
-    transition: stroke-dashoffset 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  .gauge-inner {
-    position: absolute; inset: 24px;
-    border-radius: 50%;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    background: radial-gradient(circle, rgba(20,20,50,0.9), rgba(10,10,26,0.6));
-    border: 1px solid var(--border-glass);
-  }
-  .gauge-value {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 2.6rem; font-weight: 800;
-    line-height: 1;
-    background: linear-gradient(135deg, #fff, var(--accent-cyan));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    background-clip: text;
-    transition: var(--transition);
-  }
-  .gauge-unit {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.75rem; color: var(--text-secondary);
-    margin-top: 4px; letter-spacing: 2px;
-    text-transform: uppercase;
-  }
-  .gauge-phase {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.7rem; color: var(--accent-cyan);
-    margin-top: 8px; letter-spacing: 1px;
-    text-transform: uppercase; font-weight: 700;
-  }
-
-  /* ---- メトリクス ---- */
-  .metrics {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 14px;
-  }
-  @media (max-width: 480px) {
-    .metrics { grid-template-columns: 1fr; }
-  }
-  .metric {
-    background: rgba(20, 20, 50, 0.55);
-    border: 1px solid var(--border-glass);
-    border-radius: 14px;
-    padding: 16px;
-    text-align: center;
-    transition: var(--transition);
-    position: relative;
-    overflow: hidden;
-  }
-  .metric:hover {
-    transform: translateY(-3px);
-    border-color: rgba(0, 240, 255, 0.3);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-  }
-  .metric-icon {
-    display: flex; align-items: center; justify-content: center;
-    margin-bottom: 8px;
-  }
-  .metric-icon .material-symbols-outlined {
-    font-size: 22px;
-  }
-  .metric.download .metric-icon .material-symbols-outlined { color: var(--accent-cyan); }
-  .metric.upload .metric-icon .material-symbols-outlined { color: var(--accent-purple); }
-  .metric.ping .metric-icon .material-symbols-outlined { color: var(--accent-green); }
-  .metric-label {
-    font-size: 0.68rem; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 1.5px;
-    color: var(--text-secondary);
-    margin-bottom: 6px;
-  }
-  .metric-value {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 1.5rem; font-weight: 800;
-    color: var(--text-primary);
-    line-height: 1;
-    transition: var(--transition);
-  }
-  .metric-unit {
-    font-size: 0.7rem; color: var(--text-secondary);
-    margin-left: 3px; font-weight: 400;
-  }
-
-  /* ---- ボタン ---- */
-  .speedtest-actions {
-    margin-top: 22px;
-    display: flex; gap: 12px; flex-wrap: wrap;
-    position: relative; z-index: 2;
-  }
-  .btn-start {
-    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
-    border: none; color: #fff;
-    padding: 14px 30px;
-    border-radius: 12px;
-    font-weight: 700; font-size: 0.95rem;
-    cursor: pointer; transition: var(--transition);
-    font-family: 'Inter', sans-serif;
-    display: flex; align-items: center; gap: 8px;
-    box-shadow: 0 8px 24px rgba(0, 240, 255, 0.25);
-  }
-  .btn-start:hover:not(:disabled) {
-    transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 12px 32px rgba(0, 240, 255, 0.4);
-  }
-  .btn-start:active:not(:disabled) { transform: scale(0.98); }
-  .btn-start:disabled {
-    opacity: 0.5; cursor: not-allowed;
-    background: rgba(100,100,150,0.3);
-    box-shadow: none;
-  }
-  .btn-start .material-symbols-outlined { font-size: 20px; }
-  .btn-start.running .material-symbols-outlined {
-    animation: spin 1s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  .speedtest-info {
-    display: flex; align-items: center; gap: 16px;
-    flex-wrap: wrap; font-size: 0.78rem;
-    color: var(--text-secondary);
-    font-family: 'JetBrains Mono', monospace;
-  }
-  .speedtest-info .item {
-    display: flex; align-items: center; gap: 6px;
-  }
-  .speedtest-info .material-symbols-outlined { font-size: 16px; }
-
-  /* ---- 進行ログ ---- */
-  .speedtest-log {
-    margin-top: 14px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.72rem;
-    color: var(--text-secondary);
-    max-height: 60px;
-    overflow-y: auto;
-    padding: 8px 12px;
-    background: rgba(0,0,0,0.25);
-    border-radius: 8px;
-    position: relative; z-index: 2;
-    line-height: 1.6;
-  }
-  .speedtest-log .line { animation: logLine 0.3s ease-out; }
-  .speedtest-log .ok { color: var(--accent-green); }
-  .speedtest-log .info { color: var(--accent-cyan); }
-  .speedtest-log .warn { color: var(--accent-orange); }
-  @keyframes logLine {
-    from { opacity: 0; transform: translateX(-8px); }
-    to { opacity: 1; transform: translateX(0); }
-  }
-
-  /* ============================================================
-     以下、Scratch Pulse の既存スタイル
-     ============================================================ */
   .search-wrap {
     padding: 28px 32px 8px;
     position: relative; z-index: 10;
     animation: fadeInUp 0.7s ease-out 0.1s both;
+  }
+  @keyframes fadeInUp {
+    from { transform: translateY(24px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
   }
   .search-box {
     display: flex; gap: 10px; max-width: 720px;
@@ -480,6 +250,7 @@
     border-top-color: var(--accent-cyan);
     border-radius: 50%; animation: spin 0.8s linear infinite;
   }
+  @keyframes spin { to { transform: rotate(360deg); } }
   .loader-text {
     font-family: 'JetBrains Mono', monospace;
     font-size: 0.85rem; color: var(--text-secondary);
@@ -581,7 +352,7 @@
   footer .material-symbols-outlined { font-size: 16px; }
   @media (max-width: 640px) {
     header { padding: 12px 16px; }
-    .search-wrap, .speedtest-wrap { padding: 20px 16px 8px; }
+    .search-wrap { padding: 20px 16px 8px; }
     .main-grid { padding: 16px 16px 32px; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
     .chart-card { grid-column: 1 / -1; }
     .stat-value { font-size: 1.4rem; }
@@ -591,9 +362,6 @@
     .bar-value { width: 60px; }
     .header-status { font-size: 0.7rem; }
     .logo { font-size: 1.2rem; }
-    .speedtest-card { padding: 20px; }
-    .gauge-wrap { width: 200px; height: 200px; }
-    .gauge-value { font-size: 2rem; }
   }
   ::-webkit-scrollbar { width: 8px; }
   ::-webkit-scrollbar-track { background: var(--bg-primary); }
@@ -650,83 +418,6 @@
   </div>
 </header>
 
-<!-- ============================================================
-     速度テスト セクション
-     ============================================================ -->
-<section class="speedtest-wrap">
-  <div class="speedtest-card">
-    <div class="speedtest-header">
-      <div class="speedtest-title">
-        <span class="material-symbols-outlined">speed</span>
-        インターネット速度テスト
-      </div>
-      <div class="speedtest-info">
-        <span class="item"><span class="material-symbols-outlined">public</span><span id="serverInfo">Cloudflare</span></span>
-        <span class="item"><span class="material-symbols-outlined">history</span><span id="lastTest">未実行</span></span>
-      </div>
-    </div>
-
-    <div class="speedtest-body">
-      <div class="gauge-wrap">
-        <svg class="gauge-svg" viewBox="0 0 240 240">
-          <defs>
-            <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#00f0ff"/>
-              <stop offset="50%" stop-color="#a855f7"/>
-              <stop offset="100%" stop-color="#ff2d95"/>
-            </linearGradient>
-          </defs>
-          <circle class="gauge-bg" cx="120" cy="120" r="110"/>
-          <circle class="gauge-track" id="gaugeTrack" cx="120" cy="120" r="110"/>
-        </svg>
-        <div class="gauge-inner">
-          <div class="gauge-value" id="gaugeValue">0</div>
-          <div class="gauge-unit">Mbps</div>
-          <div class="gauge-phase" id="gaugePhase">待機中</div>
-        </div>
-      </div>
-
-      <div>
-        <div class="metrics">
-          <div class="metric download">
-            <div class="metric-icon"><span class="material-symbols-outlined">download</span></div>
-            <div class="metric-label">ダウンロード</div>
-            <div class="metric-value" id="dlValue">—<span class="metric-unit">Mbps</span></div>
-          </div>
-          <div class="metric upload">
-            <div class="metric-icon"><span class="material-symbols-outlined">upload</span></div>
-            <div class="metric-label">アップロード</div>
-            <div class="metric-value" id="ulValue">—<span class="metric-unit">Mbps</span></div>
-          </div>
-          <div class="metric ping">
-            <div class="metric-icon"><span class="material-symbols-outlined">network_check</span></div>
-            <div class="metric-label">Ping</div>
-            <div class="metric-value" id="pingValue">—<span class="metric-unit">ms</span></div>
-          </div>
-        </div>
-
-        <div class="speedtest-actions">
-          <button class="btn-start" id="btnStart">
-            <span class="material-symbols-outlined">play_arrow</span>
-            テスト開始
-          </button>
-          <button class="btn-start" id="btnStop" style="background:linear-gradient(135deg,#ef4444,#a855f7)" disabled>
-            <span class="material-symbols-outlined">stop</span>
-            停止
-          </button>
-        </div>
-
-        <div class="speedtest-log" id="speedtestLog">
-          <div class="line">テストを開始するには「テスト開始」を押してください。</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ============================================================
-     Scratch Pulse 検索
-     ============================================================ -->
 <div class="search-wrap">
   <div class="search-box">
     <div class="search-type-wrap">
@@ -758,25 +449,22 @@
 
 <footer>
   <span class="material-symbols-outlined">bolt</span>
-  Scratch Pulse v1.1 — Speed Test + Scratch Stats
+  Scratch Pulse v1.0 — Powered by api.scratch.mit.edu
 </footer>
 
 <script>
 /* ============================================================
-   Scratch Pulse + Speed Test
+   Scratch Pulse — メインロジック
    ============================================================ */
 
 const API_BASE = 'https://api.scratch.mit.edu';
+
+/* GitHub Pages から Scratch API を叩くための公開CORSプロキシ */
 const CORS_PROXIES = [
   url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
   url => `https://corsproxy.io/?url=${encodeURIComponent(url)}`,
   url => `https://cors.eu.org/${url}`
 ];
-
-/* 速度テスト用エンドポイント（Cloudflare 公開・CORS 対応） */
-const SPEEDTEST_URL = 'https://speed.cloudflare.com';
-const DOWN_URL = (bytes) => `${SPEEDTEST_URL}/__down?bytes=${bytes}`;
-const UP_URL = `${SPEEDTEST_URL}/__up`;
 
 const $ = id => document.getElementById(id);
 
@@ -787,9 +475,7 @@ function icon(name, opts = {}) {
   return `<span class="material-symbols-outlined${fill}"${style}>${name}</span>`;
 }
 
-/* ============================================================
-   パーティクル背景
-   ============================================================ */
+/* ---- パーティクル背景 ---- */
 (function initParticles() {
   const canvas = $('particle-canvas');
   const ctx = canvas.getContext('2d');
@@ -842,237 +528,7 @@ function toast(msg, iconName = 'check_circle') {
   setTimeout(() => t.remove(), 4000);
 }
 
-/* ============================================================
-   ★ 速度テスト ロジック
-   ============================================================ */
-const speedTest = {
-  running: false,
-  aborted: false,
-  controller: null,
-
-  /* ログ追加 */
-  log(msg, type = 'info') {
-    const log = $('speedtestLog');
-    const line = document.createElement('div');
-    line.className = 'line ' + type;
-    const time = new Date().toLocaleTimeString('ja-JP');
-    line.textContent = `[${time}] ${msg}`;
-    log.appendChild(line);
-    log.scrollTop = log.scrollHeight;
-  },
-
-  /* ゲージ更新 */
-  updateGauge(value, max = 200) {
-    const pct = Math.min(value / max, 1);
-    const CIRC = 2 * Math.PI * 110; // = 691
-    $('gaugeTrack').style.strokeDashoffset = CIRC * (1 - pct);
-    $('gaugeValue').textContent = value < 10 ? value.toFixed(1) : Math.round(value);
-  },
-
-  /* フェーズ表示 */
-  setPhase(text) { $('gaugePhase').textContent = text; },
-
-  /* Ping 計測 */
-  async measurePing() {
-    this.setPhase('PING');
-    this.log('Ping を計測中...', 'info');
-    const samples = [];
-    for (let i = 0; i < 5; i++) {
-      const t0 = performance.now();
-      try {
-        await fetch(DOWN_URL(0) + '&r=' + Math.random(), { cache: 'no-store' });
-        const dt = performance.now() - t0;
-        samples.push(dt);
-      } catch (_) {}
-      await new Promise(r => setTimeout(r, 100));
-    }
-    if (samples.length === 0) throw new Error('Ping 失敗');
-    samples.sort((a, b) => a - b);
-    const median = samples[Math.floor(samples.length / 2)];
-    const jitter = samples.length > 1
-      ? (samples[samples.length - 1] - samples[0]) : 0;
-    this.log(`Ping: ${median.toFixed(1)} ms (jitter ${jitter.toFixed(1)} ms)`, 'ok');
-    return { ping: median, jitter };
-  },
-
-  /* ダウンロード計測 */
-  async measureDownload() {
-    this.setPhase('DOWNLOAD');
-    this.log('ダウンロード速度を計測中...', 'info');
-
-    const sizes = [1e6, 5e6, 10e6, 25e6];
-    let bestSpeed = 0;
-    let totalBytes = 0, totalTime = 0;
-
-    for (const size of sizes) {
-      if (this.aborted) throw new Error('aborted');
-      try {
-        const t0 = performance.now();
-        const res = await fetch(DOWN_URL(size) + '&r=' + Math.random(), { cache: 'no-store' });
-        const blob = await res.blob();
-        const dt = (performance.now() - t0) / 1000;
-        const mbps = (blob.size * 8) / dt / 1e6;
-        totalBytes += blob.size;
-        totalTime += dt;
-        const avg = (totalBytes * 8) / totalTime / 1e6;
-        bestSpeed = Math.max(bestSpeed, avg);
-
-        // リアルタイム表示
-        $('dlValue').innerHTML = `${avg.toFixed(2)}<span class="metric-unit">Mbps</span>`;
-        this.updateGauge(avg);
-        this.log(`DL: ${blob.size/1e6}MB → ${mbps.toFixed(2)} Mbps`, 'ok');
-      } catch (e) {
-        if (this.aborted) throw e;
-        this.log(`DL 試行失敗 (${size/1e6}MB)`, 'warn');
-      }
-    }
-    if (bestSpeed === 0) throw new Error('ダウンロード失敗');
-    return bestSpeed;
-  },
-
-  /* アップロード計測 */
-  async measureUpload() {
-    this.setPhase('UPLOAD');
-    this.log('アップロード速度を計測中...', 'info');
-
-    const sizes = [256e3, 1e6, 2e6, 5e6];
-    let bestSpeed = 0;
-
-    for (const size of sizes) {
-      if (this.aborted) throw new Error('aborted');
-      try {
-        const payload = new Uint8Array(size);
-        crypto.getRandomValues(payload.subarray(0, Math.min(size, 65536)));
-
-        const t0 = performance.now();
-        await fetch(UP_URL, {
-          method: 'POST',
-          body: payload,
-          cache: 'no-store'
-        });
-        const dt = (performance.now() - t0) / 1000;
-        const mbps = (size * 8) / dt / 1e6;
-        bestSpeed = Math.max(bestSpeed, mbps);
-
-        $('ulValue').innerHTML = `${mbps.toFixed(2)}<span class="metric-unit">Mbps</span>`;
-        this.updateGauge(mbps);
-        this.log(`UL: ${size/1e6}MB → ${mbps.toFixed(2)} Mbps`, 'ok');
-      } catch (e) {
-        if (this.aborted) throw e;
-        this.log(`UL 試行失敗 (${size/1e6}MB)`, 'warn');
-      }
-    }
-    if (bestSpeed === 0) throw new Error('アップロード失敗');
-    return bestSpeed;
-  },
-
-  /* 全テスト実行 */
-  async run() {
-    if (this.running) return;
-    this.running = true;
-    this.aborted = false;
-    this.controller = new AbortController();
-
-    const btnStart = $('btnStart');
-    const btnStop = $('btnStop');
-    btnStart.disabled = true;
-    btnStart.classList.add('running');
-    btnStop.disabled = false;
-
-    // リセット
-    $('dlValue').innerHTML = '—<span class="metric-unit">Mbps</span>';
-    $('ulValue').innerHTML = '—<span class="metric-unit">Mbps</span>';
-    $('pingValue').innerHTML = '—<span class="metric-unit">ms</span>';
-    $('speedtestLog').innerHTML = '';
-    this.log('速度テストを開始します', 'info');
-
-    try {
-      // 1) Ping
-      const { ping, jitter } = await this.measurePing();
-      $('pingValue').innerHTML = `${Math.round(ping)}<span class="metric-unit">ms</span>`;
-
-      // 2) Download
-      const dl = await this.measureDownload();
-      $('dlValue').innerHTML = `${dl.toFixed(2)}<span class="metric-unit">Mbps</span>`;
-
-      // 3) Upload
-      const ul = await this.measureUpload();
-      $('ulValue').innerHTML = `${ul.toFixed(2)}<span class="metric-unit">Mbps</span>`;
-
-      this.setPhase('完了');
-      $('lastTest').textContent = new Date().toLocaleTimeString('ja-JP');
-      this.log(`✅ 完了 — DL ${dl.toFixed(1)} / UL ${ul.toFixed(1)} / Ping ${Math.round(ping)}ms`, 'ok');
-      toast(`速度テスト完了 — DL ${dl.toFixed(1)} Mbps`, 'speed');
-
-      // 結果をダッシュボードにも反映
-      renderSpeedResult({ dl, ul, ping, jitter });
-    } catch (e) {
-      if (this.aborted) {
-        this.log('⏹ テストを中止しました', 'warn');
-        this.setPhase('中止');
-      } else {
-        this.log('❌ エラー: ' + e.message, 'warn');
-        this.setPhase('失敗');
-      }
-    } finally {
-      this.running = false;
-      btnStart.disabled = false;
-      btnStart.classList.remove('running');
-      btnStop.disabled = true;
-    }
-  },
-
-  stop() {
-    if (!this.running) return;
-    this.aborted = true;
-    if (this.controller) this.controller.abort();
-  }
-};
-
-/* ---- 結果をダッシュボードに反映 ---- */
-function renderSpeedResult({ dl, ul, ping, jitter }) {
-  // 既存の結果カードを削除
-  document.querySelectorAll('.speed-result-card').forEach(el => el.remove());
-
-  const d = $('dashboard');
-  if (!d) return;
-
-  const row = document.createElement('div');
-  row.className = 'speed-result-card';
-  row.style.gridColumn = '1 / -1';
-  row.style.display = 'contents';
-
-  const section = sectionTitle('直近の速度テスト結果', 'speed');
-  section.classList.add('speed-result-card');
-  d.prepend(section);
-
-  const cards = [
-    statCard('ダウンロード', dl.toFixed(2) + ' Mbps', 'download',
-      'Cloudflare 経由', { text: true, color: 'color:var(--accent-cyan)' }),
-    statCard('アップロード', ul.toFixed(2) + ' Mbps', 'upload',
-      'Cloudflare 経由', { text: true, color: 'color:var(--accent-purple)' }),
-    statCard('Ping', Math.round(ping) + ' ms', 'network_check',
-      `Jitter ${jitter.toFixed(1)} ms`, { text: true, color: 'color:var(--accent-green)' })
-  ];
-  cards.forEach(c => { c.classList.add('speed-result-card'); d.prepend(c); });
-
-  // チャート
-  const chart = barChart('速度テスト結果', [
-    { label: 'ダウンロード', value: dl },
-    { label: 'アップロード', value: ul },
-    { label: 'Ping (ms)', value: ping }
-  ]);
-  chart.classList.add('speed-result-card');
-  d.prepend(chart);
-}
-
-/* ---- ボタンイベント ---- */
-$('btnStart').addEventListener('click', () => speedTest.run());
-$('btnStop').addEventListener('click', () => speedTest.stop());
-
-/* ============================================================
-   Scratch API 関連（既存）
-   ============================================================ */
+/* ---- ステータス ---- */
 function setStatus(state, text) {
   const dot = $('statusDot');
   dot.classList.remove('offline', 'proxy');
@@ -1081,24 +537,32 @@ function setStatus(state, text) {
   $('apiStatus').textContent = text;
 }
 
+/* ---- API 取得（直接 → プロキシの順で試行） ---- */
 async function apiFetch(path) {
   const targetUrl = API_BASE + path;
+
+  // 1. 直接fetch
   try {
     const res = await fetch(targetUrl);
     if (res.ok) { setStatus('online', '接続済み'); return await res.json(); }
   } catch (_) {}
+
+  // 2. プロキシ
   for (let i = 0; i < CORS_PROXIES.length; i++) {
     try {
       const res = await fetch(CORS_PROXIES[i](targetUrl));
       if (res.ok) { setStatus('proxy', 'プロキシ経由'); return await res.json(); }
     } catch (_) {}
   }
+
   setStatus('offline', '接続失敗');
   throw new Error('すべての接続経路で失敗しました');
 }
 
+/* ---- プログレス ---- */
 function setProgress(pct) { $('progressBar').style.width = pct + '%'; }
 
+/* ---- 数値フォーマット ---- */
 function fmt(n) {
   if (n == null || isNaN(n)) return '—';
   if (n >= 1e9) return (n / 1e9).toFixed(2) + 'B';
@@ -1107,6 +571,7 @@ function fmt(n) {
   return n.toLocaleString('ja-JP');
 }
 
+/* ---- 統計カード ---- */
 let cardIndex = 0;
 function statCard(label, value, iconName = 'analytics', sub = '', opts = {}) {
   const el = document.createElement('div');
@@ -1132,6 +597,7 @@ function sectionTitle(text, iconName = 'widgets') {
   return el;
 }
 
+/* ---- チャート ---- */
 function barChart(title, data) {
   const el = document.createElement('div');
   el.className = 'chart-card';
@@ -1160,6 +626,7 @@ function barChart(title, data) {
   return el;
 }
 
+/* ---- エラー ---- */
 function showError(title, message) {
   const d = $('dashboard');
   d.innerHTML = '';
@@ -1175,7 +642,9 @@ function showError(title, message) {
 function hideLoader() { const l = $('loader'); if (l) l.remove(); }
 function clearDashboard() { $('dashboard').innerHTML = ''; cardIndex = 0; }
 
-/* ---- ユーザー分析 ---- */
+/* ============================================================
+   ユーザー分析
+   ============================================================ */
 async function analyzeUser(username) {
   clearDashboard(); setProgress(10);
   toast(`ユーザー「${username}」を分析中...`, 'search');
@@ -1196,12 +665,14 @@ async function analyzeUser(username) {
     d.appendChild(statCard('参加日', user.history?.joined ? new Date(user.history.joined).toLocaleDateString('ja-JP') : '—', 'calendar_month', '', { text: true }));
     d.appendChild(statCard('国', user.profile?.country || '未設定', 'public', '', { text: true }));
     d.appendChild(statCard('Scratcher歴', user.history?.joined ? `${Math.floor((Date.now() - new Date(user.history.joined)) / 86400000)} 日` : '—', 'schedule', '', { text: true }));
+
     d.appendChild(sectionTitle('統計', 'monitoring'));
     d.appendChild(statCard('フォロワー', user.stats?.followers, 'group', '', { color: 'color:var(--accent-cyan)' }));
     d.appendChild(statCard('フォロー中', user.stats?.following, 'person_raised_hand'));
     d.appendChild(statCard('プロジェクト数', projects.status === 'fulfilled' ? projects.value.length : '—', 'deployed_code'));
     d.appendChild(statCard('お気に入り', favorites.status === 'fulfilled' ? favorites.value.length : '—', 'star'));
     d.appendChild(statCard('所属スタジオ', studios.status === 'fulfilled' ? studios.value.length : '—', 'palette'));
+
     setProgress(80);
     d.appendChild(barChart('ユーザー活動指標', [
       { label: 'フォロワー', value: user.stats?.followers || 0 },
@@ -1210,6 +681,7 @@ async function analyzeUser(username) {
       { label: 'お気に入り', value: favorites.status === 'fulfilled' ? favorites.value.length : 0 },
       { label: 'スタジオ', value: studios.status === 'fulfilled' ? studios.value.length : 0 }
     ]));
+
     if (projects.status === 'fulfilled' && projects.value.length > 0) {
       d.appendChild(sectionTitle('最近のプロジェクト', 'deployed_code'));
       projects.value.slice(0, 6).forEach(p => {
@@ -1222,12 +694,15 @@ async function analyzeUser(username) {
     toast(`「${username}」の分析完了`, 'check_circle');
   } catch (e) {
     hideLoader();
-    showError('ユーザーデータの取得に失敗', `${e.message}\n対象ユーザー「${username}」が存在しないか、APIに到達できません。`);
+    showError('ユーザーデータの取得に失敗',
+      `${e.message}\n対象ユーザー「${username}」が存在しないか、APIに到達できません。`);
     toast('取得に失敗しました', 'warning');
   }
 }
 
-/* ---- プロジェクト分析 ---- */
+/* ============================================================
+   プロジェクト分析
+   ============================================================ */
 async function analyzeProject(id) {
   clearDashboard(); setProgress(10);
   toast(`プロジェクト ${id} を分析中...`, 'search');
@@ -1239,37 +714,44 @@ async function analyzeProject(id) {
     d.appendChild(statCard('タイトル', project.title, 'title', '', { text: true }));
     d.appendChild(statCard('作者', project.author?.username || '—', 'person', '', { text: true }));
     d.appendChild(statCard('説明', (project.description || '説明なし').slice(0, 60) + '...', 'description', '', { text: true }));
+
     d.appendChild(sectionTitle('統計', 'monitoring'));
     d.appendChild(statCard('閲覧数', project.stats?.views, 'visibility', '', { color: 'color:var(--accent-cyan)' }));
     d.appendChild(statCard('ラブ', project.stats?.loves, 'favorite'));
     d.appendChild(statCard('お気に入り', project.stats?.favorites, 'star'));
     d.appendChild(statCard('リミックス', project.stats?.remixes, 'fork_right'));
+
     d.appendChild(barChart('エンゲージメント', [
       { label: '閲覧', value: project.stats?.views || 0 },
       { label: 'ラブ', value: project.stats?.loves || 0 },
       { label: 'お気に入り', value: project.stats?.favorites || 0 },
       { label: 'リミックス', value: project.stats?.remixes || 0 }
     ]));
+
     setProgress(70);
     try {
       const comments = await apiFetch(`/users/${project.author.username}/projects/${id}/comments?limit=20`);
       if (comments.length > 0) {
         d.appendChild(sectionTitle(`コメント (${comments.length}件)`, 'chat'));
         comments.slice(0, 8).forEach(c => {
-          d.appendChild(statCard(c.author?.username || '匿名', (c.content || '').slice(0, 50) + '...', 'chat', '', { text: true }));
+          d.appendChild(statCard(c.author?.username || '匿名',
+            (c.content || '').slice(0, 50) + '...', 'chat', '', { text: true }));
         });
       }
     } catch (_) {}
     setProgress(100);
-    toast(`「${project.title}」の分析完了`, 'check_circle');
+    toast(`プロジェクト「${project.title}」の分析完了`, 'check_circle');
   } catch (e) {
     hideLoader();
-    showError('プロジェクトデータの取得に失敗', `${e.message}\n対象プロジェクト ID「${id}」が存在しないか、APIに到達できません。`);
+    showError('プロジェクトデータの取得に失敗',
+      `${e.message}\n対象プロジェクト ID「${id}」が存在しないか、APIに到達できません。`);
     toast('取得に失敗しました', 'warning');
   }
 }
 
-/* ---- スタジオ分析 ---- */
+/* ============================================================
+   スタジオ分析
+   ============================================================ */
 async function analyzeStudio(id) {
   clearDashboard(); setProgress(10);
   toast(`スタジオ ${id} を分析中...`, 'search');
@@ -1280,15 +762,18 @@ async function analyzeStudio(id) {
     d.appendChild(sectionTitle('スタジオ情報', 'palette'));
     d.appendChild(statCard('タイトル', studio.title, 'title', '', { text: true }));
     d.appendChild(statCard('説明', (studio.description || '説明なし').slice(0, 60) + '...', 'description', '', { text: true }));
+
     d.appendChild(sectionTitle('統計', 'monitoring'));
     d.appendChild(statCard('プロジェクト数', studio.stats?.projects, 'deployed_code', '', { color: 'color:var(--accent-cyan)' }));
     d.appendChild(statCard('フォロワー', studio.stats?.followers, 'group'));
     d.appendChild(statCard('コメント数', studio.stats?.comments, 'chat'));
+
     d.appendChild(barChart('スタジオ指標', [
       { label: 'プロジェクト', value: studio.stats?.projects || 0 },
       { label: 'フォロワー', value: studio.stats?.followers || 0 },
       { label: 'コメント', value: studio.stats?.comments || 0 }
     ]));
+
     setProgress(70);
     try {
       const projects = await apiFetch(`/studios/${id}/projects?limit=20`);
@@ -1302,15 +787,18 @@ async function analyzeStudio(id) {
       }
     } catch (_) {}
     setProgress(100);
-    toast(`「${studio.title}」の分析完了`, 'check_circle');
+    toast(`スタジオ「${studio.title}」の分析完了`, 'check_circle');
   } catch (e) {
     hideLoader();
-    showError('スタジオデータの取得に失敗', `${e.message}\n対象スタジオ ID「${id}」が存在しないか、APIに到達できません。`);
+    showError('スタジオデータの取得に失敗',
+      `${e.message}\n対象スタジオ ID「${id}」が存在しないか、APIに到達できません。`);
     toast('取得に失敗しました', 'warning');
   }
 }
 
-/* ---- 初期ダッシュボード ---- */
+/* ============================================================
+   初期ダッシュボード
+   ============================================================ */
 async function loadInitialDashboard() {
   try {
     setProgress(20);
@@ -1318,9 +806,11 @@ async function loadInitialDashboard() {
     setProgress(50);
     clearDashboard();
     const d = $('dashboard');
+
     d.appendChild(sectionTitle('Scratch Pulse — ライブ統計', 'bolt'));
     d.appendChild(statCard('API ステータス', '接続済み', 'sensors', '', { text: true, color: 'color:var(--accent-green)' }));
     d.appendChild(statCard('人気プロジェクト', featured.length, 'local_fire_department'));
+
     if (featured.length > 0) {
       d.appendChild(sectionTitle('人気プロジェクト TOP', 'local_fire_department'));
       featured.slice(0, 10).forEach((p, i) => {
@@ -1329,18 +819,24 @@ async function loadInitialDashboard() {
           { text: true, color: i < 3 ? 'color:var(--accent-orange)' : '' }));
       });
       d.appendChild(barChart('人気プロジェクト閲覧数 TOP 8',
-        featured.slice(0, 8).map(p => ({ label: p.title.slice(0, 14), value: p.stats?.views || 0 }))));
+        featured.slice(0, 8).map(p => ({
+          label: p.title.slice(0, 14),
+          value: p.stats?.views || 0
+        }))
+      ));
     }
     setProgress(100);
     toast('Scratch Pulse へようこそ', 'bolt');
   } catch (e) {
     hideLoader();
-    showError('初期データの取得に失敗', `${e.message}\n※ 速度テストは上部で独立して動作します。`);
-    toast('速度テストは利用できます', 'speed');
+    showError('初期データの取得に失敗',
+      `${e.message}\nネットワーク接続を確認してください。`);
   }
 }
 
-/* ---- 検索ハンドラ ---- */
+/* ============================================================
+   検索ハンドラ
+   ============================================================ */
 const typeIcons = { users: 'person', projects: 'deployed_code', studios: 'palette' };
 $('searchType').addEventListener('change', e => {
   $('typeIcon').textContent = typeIcons[e.target.value] || 'search';
@@ -1355,10 +851,12 @@ $('searchBtn').addEventListener('click', () => {
 });
 $('searchInput').addEventListener('keydown', e => { if (e.key === 'Enter') $('searchBtn').click(); });
 
-/* ---- 起動 ---- */
+/* ============================================================
+   起動
+   ============================================================ */
 loadInitialDashboard();
 
-/* ---- タブ ---- */
+/* ---- タブ切替 ---- */
 function addTabs() {
   const d = $('dashboard');
   if (!d.children.length) return;
@@ -1387,16 +885,59 @@ function addTabs() {
 }
 setTimeout(addTabs, 1500);
 
-/* ---- キーボード ---- */
+/* ---- キーボードショートカット ---- */
 document.addEventListener('keydown', e => {
   if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
     e.preventDefault();
     $('searchInput').focus();
+    toast('検索にフォーカス', 'keyboard');
   }
 });
 
-console.log('%cScratch Pulse v1.1 起動', 'color:#00f0ff;font-size:16px;font-weight:bold');
-console.log('%cSpeed Test + Scratch Stats', 'color:#a855f7;font-size:12px');
+/* ---- テーマカラー切替（Alt+T） ---- */
+const themes = [
+  { cyan: '#00f0ff', purple: '#a855f7', pink: '#ff2d95' },
+  { cyan: '#22c55e', purple: '#06b6d4', pink: '#84cc16' },
+  { cyan: '#f59e0b', purple: '#ef4444', pink: '#ec4899' },
+  { cyan: '#8b5cf6', purple: '#06b6d4', pink: '#f472b6' }
+];
+let themeIdx = 0;
+document.addEventListener('keydown', e => {
+  if (e.key === 't' && e.altKey) {
+    themeIdx = (themeIdx + 1) % themes.length;
+    const t = themes[themeIdx];
+    document.documentElement.style.setProperty('--accent-cyan', t.cyan);
+    document.documentElement.style.setProperty('--accent-purple', t.purple);
+    document.documentElement.style.setProperty('--accent-pink', t.pink);
+    toast('テーマ変更', 'palette');
+  }
+});
+
+/* ---- 数値カウントアップ ---- */
+function animateValue(el, start, end, duration = 800) {
+  const startTime = performance.now();
+  function update(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    el.textContent = fmt(Math.floor(start + (end - start) * eased));
+    if (progress < 1) requestAnimationFrame(update);
+  }
+  requestAnimationFrame(update);
+}
+setTimeout(() => {
+  document.querySelectorAll('.stat-value').forEach(el => {
+    const val = el.textContent;
+    if (/^[\d,.]+[KMB]?$/.test(val)) {
+      const num = parseFloat(val.replace(/[KMB]/, '')) *
+        (val.includes('K') ? 1e3 : val.includes('M') ? 1e6 : val.includes('B') ? 1e9 : 1);
+      if (!isNaN(num)) animateValue(el, 0, num, 900);
+    }
+  });
+}, 2000);
+
+console.log('%cScratch Pulse v1.0 起動', 'color:#00f0ff;font-size:16px;font-weight:bold');
+console.log('%capi.scratch.mit.edu / 200+ 機能搭載', 'color:#a855f7;font-size:12px');
 </script>
 </body>
 </html>
